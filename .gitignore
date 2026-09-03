@@ -1,0 +1,14 @@
+.env
+.env.*
+*.pem
+*.key
+wandb/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store
+.venv/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
