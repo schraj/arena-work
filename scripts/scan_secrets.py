@@ -8,8 +8,8 @@ source looks clean. So this scans notebook outputs, not just source.
 import json, re, sys, pathlib
 
 PATTERNS = [
-    ("OpenAI key",     re.compile(r"sk-(?!ant-)[A-Za-z0-9_\-]{20,}")),
-    ("Anthropic key",  re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}")),
+    ("OpenAI key",     re.compile(r"(?<![A-Za-z0-9_\-])sk-(?!ant-)[A-Za-z0-9_\-]{20,}")),
+    ("Anthropic key",  re.compile(r"(?<![A-Za-z0-9_\-])sk-ant-[A-Za-z0-9_\-]{20,}")),
     ("HuggingFace",    re.compile(r"\bhf_[A-Za-z0-9]{30,}")),
     ("AWS key id",     re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
     ("Google API key", re.compile(r"\bAIza[0-9A-Za-z_\-]{35}\b")),
