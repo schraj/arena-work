@@ -12,3 +12,6 @@ __pycache__/
 *.pth
 *.ckpt
 *.safetensors
+
+# private study notes
+NOTES.md
