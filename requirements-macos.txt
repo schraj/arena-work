@@ -1,0 +1,90 @@
+# ARENA_3.0 requirements adapted for macOS arm64 (Apple Silicon).
+# Removed vs requirements.txt (Linux/CUDA-only, no macOS wheels):
+#   --extra-index-url cu118, torchtext, bitsandbytes, jax[cuda12], brax, envpool, mujoco-py extra
+
+# PyTorch (MPS backend on Apple Silicon)
+torch
+torchvision
+torchaudio
+
+# ML & DL
+huggingface_hub
+torchinfo
+diffusers
+wandb
+accelerate
+ftfy
+safetensors
+openai>=3.1,<4  # inspect_ai's OpenRouter provider needs >=3.1 (3.3); upstream caps <4
+sentence-transformers
+peft
+
+# Data manipulation and analysis
+einops
+eindex-callum>=0.1.0,<0.2.0  # PyPI (git version is 0.2.x, conflicts with sae-vis 0.3.7)
+pandas
+numpy-stl
+scikit-learn
+hdbscan
+umap-learn
+
+# Utilities
+requests
+pytest
+tqdm
+ipykernel
+notebook
+ipywidgets==7.7.1
+# plotly >=6 rebuilt go.FigureWidget on anywidget; without it the widget exercises
+# raise ImportError: Please install anywidget to use the FigureWidget class
+anywidget
+jupyterlab-widgets==1.1.1
+jupyter
+pre-commit
+gdown
+portalocker>=2.0.0
+typeguard
+jaxtyping
+tiktoken
+frozendict
+tabulate
+opencv-python
+nbformat
+docformatter
+pyyaml
+
+# Visualization
+matplotlib
+plotly
+streamlit
+streamlit-antd-components==0.2.5
+streamlit-image-select
+streamlit-on-Hover-tabs
+nnsight>=0.3.5
+imageio-ffmpeg
+mediapy
+
+# Chapter 1 (interp)
+transformer_lens>=2.16.1,<3.0.0
+transformers>=4.51,<5
+sae-lens>=6.37.4,<7.0.0
+sae-vis==0.3.7
+circuitsvis @ git+https://github.com/callummcdougall/CircuitsVis.git#subdirectory=python
+neel-plotly @ git+https://github.com/neelnanda-io/neel-plotly
+
+# Chapter 2 (RL)
+pygame
+gymnasium[atari, accept-rom-license, other]==0.29.0
+mujoco
+
+# Chapter 3 (evals)
+inspect_ai
+wikipedia
+python-dotenv
+anthropic>=0.42.0
+instructor
+
+# Post-install fix (macOS, torchvision>=0.29 + datasets<4):
+#   python scripts/patch_torchvision_videoreader.py
+# datasets 3.6 imports the removed torchvision.io.VideoReader; sae-vis pins
+# datasets<4.0.0 so we cannot take the upstream fix. Re-run after reinstalls.
