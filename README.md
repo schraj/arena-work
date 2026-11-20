@@ -19,6 +19,11 @@ chapter3_llm_evals/exercises/...
 chapter4_alignment_science/exercises/...
 ```
 
+## Issues found in the course material
+
+[`EXERCISE_ISSUES.md`](EXERCISE_ISSUES.md) logs bugs I hit in the exercises themselves (not my own),
+with the symptom, the fix I used, and whether upstream has fixed it yet.
+
 ## My tooling
 
 Beyond the exercises, things I built to run the course on my own hardware:

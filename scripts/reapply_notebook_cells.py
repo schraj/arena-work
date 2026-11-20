@@ -45,6 +45,23 @@ def src(cell: dict) -> str:
     return "".join(cell["source"])
 
 
+def merge3(base: str, mine: str, theirs: str) -> tuple[str, bool]:
+    """Line-level 3-way merge of one cell's source via `git merge-file`. Returns (text, clean)."""
+    import os, subprocess, tempfile
+    with tempfile.TemporaryDirectory() as d:
+        paths = []
+        for name, text in (("mine", mine), ("base", base), ("theirs", theirs)):
+            fp = os.path.join(d, name)
+            with open(fp, "w") as fh:
+                fh.write(text if text.endswith("\n") else text + "\n")
+            paths.append(fp)
+        r = subprocess.run(["git", "merge-file", "-p", *paths], capture_output=True, text=True)
+    out = r.stdout
+    if not (mine.endswith("\n") or theirs.endswith("\n")):
+        out = out[:-1] if out.endswith("\n") else out
+    return out, r.returncode == 0
+
+
 def align(a: list[str], b: list[str]) -> dict[int, int]:
     """Map index in a -> index in b for cells that correspond 1:1 (equal or same-size replace)."""
     m: dict[int, int] = {}
@@ -63,7 +80,7 @@ def reapply(path: str, base_rev: str, mine_rev: str, prefer_upstream: bool, dry_
     bs, ms, ns = [src(c) for c in base["cells"]], [src(c) for c in mine["cells"]], [src(c) for c in new["cells"]]
     b2m, b2u = align(bs, ms), align(bs, ns)
 
-    applied, both, unaligned = [], [], []
+    applied, both, unaligned, merged_clean, conflicts = [], [], [], [], []
     for i, j in b2m.items():
         mc = mine["cells"][j]
         i_edited = bs[i] != ms[j]
@@ -78,7 +95,14 @@ def reapply(path: str, base_rev: str, mine_rev: str, prefer_upstream: bool, dry_
             both.append(i)
             if prefer_upstream:
                 continue
-        if i_edited:
+            merged, clean = merge3(bs[i], ms[j], ns[b2u[i]])
+            if clean:  # both sides' line edits survive
+                uc["source"] = merged.splitlines(keepends=True)
+                merged_clean.append(i)
+            else:      # true conflict: keep mine, flag for a manual look
+                uc["source"] = mc["source"]
+                conflicts.append(i)
+        elif i_edited:
             uc["source"] = mc["source"]
         if mc.get("outputs"):
             uc["outputs"] = mc["outputs"]
@@ -106,7 +130,8 @@ def reapply(path: str, base_rev: str, mine_rev: str, prefer_upstream: bool, dry_
     for i in both:
         d = [l for l in difflib.unified_diff(bs[i].splitlines(), ns[b2u[i]].splitlines(), lineterm="", n=0)
              if l[:1] in "+-" and l[:3] not in ("+++", "---")]
-        tag = "kept UPSTREAM" if prefer_upstream else "took MINE, upstream had"
+        tag = ("kept UPSTREAM" if prefer_upstream else "MERGED both sides cleanly, upstream had"
+               if i in merged_clean else "CONFLICT - took MINE, review; upstream had")
         print(f"    cell {i}: {tag} ({len(d)} changed lines)")
         for l in d[:4]:
             print("       ", l[:130])

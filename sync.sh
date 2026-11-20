@@ -14,7 +14,7 @@ DEST="$(cd "$(dirname "$0")" && pwd)"
 cd "$ARENA"
 FILES=$( { git diff --name-only --diff-filter=d "$BASE"; git ls-files --others --exclude-standard; } \
   | sort -u \
-  | grep -E '^chapter[0-9]+_[^/]+/exercises/|^(requirements-macos\.txt$|runpod/|scripts/)' \
+  | grep -E '^chapter[0-9]+_[^/]+/exercises/|^(requirements-macos\.txt$|EXERCISE_ISSUES\.md$|runpod/|scripts/)' \
   | grep -vE '(^|/)solutions\.py$|_solutions\.ipynb$' \
   | grep -vE '__pycache__|\.pyc$|/wandb/|\.pt$|\.pth$|\.ckpt$' || true )
 
